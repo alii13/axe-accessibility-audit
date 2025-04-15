@@ -10,28 +10,31 @@ This script combines multiple CSV files containing accessibility test results in
 ## Installation Steps
 
 1. First, create a virtual environment to avoid conflicts with system packages:
-   ```bash
-   python3 -m venv venv
-   ```
+
+    ```bash
+    python3 -m venv venv
+    ```
 
 2. Activate the virtual environment:
-   - On macOS/Linux:
-     ```bash
-     source venv/bin/activate
-     ```
-   - On Windows:
-     ```bash
-     .\venv\Scripts\activate
-     ```
+
+    - On macOS/Linux:
+        ```bash
+        source venv/bin/activate
+        ```
+    - On Windows:
+        ```bash
+        .\venv\Scripts\activate
+        ```
 
 3. Install required packages:
-   ```bash
-   pip install pandas xlsxwriter
-   ```
+    ```bash
+    pip install pandas xlsxwriter
+    ```
 
 ## Directory Structure
 
 Your directory should look like this:
+
 ```
 .
 ├── results/
@@ -43,16 +46,18 @@ Your directory should look like this:
 ## Running the Script
 
 1. Make sure you are in the parent directory of the `results` folder:
-   ```bash
-   cd /path/to/axe-accessibility-test
-   ```
+
+    ```bash
+    cd /path/to/axe-accessibility-test
+    ```
 
 2. Run the script:
-   ```bash
-   python3 results/combine_csv.py
-   ```
+    ```bash
+    python3 results/combine_csv.py
+    ```
 
 The script will:
+
 - Process all CSV files in the `results` directory
 - Create a new Excel file named `combined_accessibility_results.xlsx`
 - Each CSV file will become a sheet in the Excel workbook
@@ -62,21 +67,23 @@ The script will:
 ## Output
 
 After successful execution, you will find:
+
 - A new file named `combined_accessibility_results.xlsx` in your current directory
 - Each sheet in the Excel file will contain:
-  - Section headers in bold with gray background
-  - Data organized in sections with proper formatting
-  - Empty rows between sections for better readability
+    - Section headers in bold with gray background
+    - Data organized in sections with proper formatting
+    - Empty rows between sections for better readability
 
 ## Troubleshooting
 
 If you encounter any errors:
 
 1. Make sure all required packages are installed:
-   ```bash
-   pip list | grep pandas
-   pip list | grep xlsxwriter
-   ```
+
+    ```bash
+    pip list | grep pandas
+    pip list | grep xlsxwriter
+    ```
 
 2. Verify you're in the correct directory with the CSV files
 3. Check if you have write permissions in the current directory
@@ -86,4 +93,4 @@ If you encounter any errors:
 
 - The script expects CSV files to be in a specific format with sections
 - Large CSV files may take longer to process
-- The Excel sheet names are limited to 31 characters as per Excel's limitations 
+- The Excel sheet names are limited to 31 characters as per Excel's limitations
