@@ -1,0 +1,108 @@
+name: Accessibility Audit
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday at midnight
+  workflow_dispatch:  # Allow manual triggering
+    inputs:
+      urls:
+        description: 'Comma-separated list of URLs to test (optional)'
+        # Example: /insights,/about,/contact
+        # Note: URLs should be relative paths from the domain
+        # The full URL will be constructed as: {domain}{url}
+        required: false
+        default: ''
+      domain:
+        description: 'Base domain for the application'
+        required: true
+        default: 'https://pr-24415.d3hx9hot5ivd2q.amplifyapp.com'
+
+jobs:
+  accessibility-audit:
+    runs-on: ubuntu-latest
+    env:
+      DOMAIN: ${{ github.event.inputs.domain }}
+      TEST_URLS: ${{ github.event.inputs.urls || format('{0}/insights,{0}/about', github.event.inputs.domain) }}
+      HEADLESS: 'true'
+      LOGIN_USERNAME: ${{ secrets.LOGIN_USERNAME }}
+      LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Clone accessibility audit repository
+        run: |
+          git clone https://github.com/your-username/axe-accessibility-audit.git
+          cd axe-accessibility-audit
+          
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install Node.js dependencies
+        run: |
+          cd axe-accessibility-audit
+          npm install
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          
+      - name: Install Python dependencies
+        run: |
+          cd axe-accessibility-audit
+          pip install -r requirements.txt
+        
+      - name: Run accessibility tests
+        run: |
+          cd axe-accessibility-audit
+          npm test
+          
+      - name: Process test results
+        run: |
+          cd axe-accessibility-audit
+          python combine_csv.py
+          python extract_violations.py
+          
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-results
+          path: |
+            axe-accessibility-audit/results/
+            axe-accessibility-audit/combined_accessibility_results.xlsx
+            axe-accessibility-audit/all_violations_except_nested_interactive.csv
+          
+      - name: Create GitHub Issue for Violations
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const violations = fs.readFileSync('axe-accessibility-audit/all_violations_except_nested_interactive.csv', 'utf8');
+            
+            const issueTitle = 'Accessibility Violations Found';
+            const issueBody = `
+            # Accessibility Audit Results
+            
+            The automated accessibility audit has found violations that need attention.
+            
+            ## Summary
+            - Total violations found: ${violations.split('\n').length - 1}
+            
+            ## Detailed Report
+            The full report is available in the workflow artifacts.
+            
+            Please review and address these accessibility issues.
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: issueTitle,
+              body: issueBody,
+              labels: ['accessibility', 'bug']
+            }); 

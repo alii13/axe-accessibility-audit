@@ -1,20 +1,51 @@
 import { Page, chromium } from 'playwright'
 import { runAccessibilityTest } from './axe-test'
+import dummyUrls,{ DUMMY_DOMAIN } from './constants/urls'
+// Get domain from environment variable or use default
+const DOMAIN = process.env.DOMAIN || DUMMY_DOMAIN
 
-const DOMAIN = 'https://pr-24415.d3hx9hot5ivd2q.amplifyapp.com'
+// Get URLs from environment variable or use default
+const urls = process.env.TEST_URLS 
+    ? process.env.TEST_URLS.split(',') 
+    : dummyUrls
+
+// Get login credentials from environment variables
+const LOGIN_USERNAME = process.env.LOGIN_USERNAME
+const LOGIN_PASSWORD = process.env.LOGIN_PASSWORD
 
 async function login({ page }: { page: Page }) {
-    await page.goto(DOMAIN)
-    // Wait for the profile dropdown to be visible, indicating successful login
-    await page.waitForSelector('[data-test-id="nav-profile-dropdown"]', {
-        timeout: 300000,
-    })
+    try {
+        // Navigate to the domain
+        await page.goto(DOMAIN)
+        
+        // Wait for the login form to be visible
+        await page.waitForSelector('#kc-form-login', { timeout: 30000 })
+        
+        // Fill in the login form
+        await page.fill('#username', LOGIN_USERNAME || '')
+        await page.fill('#password', LOGIN_PASSWORD || '')
+        
+        // Click the login button
+        await page.click('#kc-login')
+        
+        // Wait for the profile dropdown to be visible, indicating successful login
+        await page.waitForSelector('[data-test-id="nav-profile-dropdown"]', {
+            timeout: 300000,
+        })
+        
+        console.log('Successfully logged in')
+    } catch (error) {
+        console.error('Login failed:', error)
+        throw error
+    }
 }
 
 async function runTests() {
     try {
         // Launch browser
-        const browser = await chromium.launch({ headless: false })
+        const browser = await chromium.launch({ 
+            headless: process.env.HEADLESS === 'true' 
+        })
         const context = await browser.newContext()
         const page = await context.newPage()
 
@@ -22,33 +53,6 @@ async function runTests() {
         await login({ page })
 
         try {
-            // Base domain for all URLs
-
-            // List of URLs to test
-            const urls = [
-                `${DOMAIN}/assets/291db465-21bf-40c4-8106-f026b5c7d0c4/overview`,
-                `${DOMAIN}/assets/291db465-21bf-40c4-8106-f026b5c7d0c4/columns`,
-                `${DOMAIN}/assets/291db465-21bf-40c4-8106-f026b5c7d0c4/lineage`,
-                `${DOMAIN}/assets/291db465-21bf-40c4-8106-f026b5c7d0c4/contract`,
-                `${DOMAIN}/admin`,
-                `${DOMAIN}/admin/sso`,
-                `${DOMAIN}/admin/misc/warningpopover`,
-                `${DOMAIN}/admin/misc/confirmationmodal`,
-                `${DOMAIN}/admin/groups`,
-                `${DOMAIN}/admin/webhooks`,
-                `${DOMAIN}/admin/users`,
-                `${DOMAIN}/admin/smtp`,
-                `${DOMAIN}/admin/query-logs`,
-                `${DOMAIN}/admin/overview`,
-                `${DOMAIN}/admin/labs`,
-                `${DOMAIN}/admin/integrations`,
-                `${DOMAIN}/admin/event-logs`,
-                `${DOMAIN}/admin/api-tokens`,
-                `${DOMAIN}/404`,
-                // Add more URLs here as needed
-            ]
-
-
             // Run tests for each URL
             for (const url of urls) {
                 console.log(
