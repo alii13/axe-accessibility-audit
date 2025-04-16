@@ -6,8 +6,8 @@ const DOMAIN = process.env.DOMAIN || DUMMY_DOMAIN
 
 // Get URLs from environment variable or use default
 const urls = process.env.TEST_URLS 
-    ? process.env.TEST_URLS.split(',') 
-    : dummyUrls
+    ? process.env.TEST_URLS.split(',').map(url => `${DOMAIN}${url}`)
+    : dummyUrls.map(url => `${DOMAIN}${url}`)
 
 // Get login credentials from environment variables
 const LOGIN_USERNAME = process.env.LOGIN_USERNAME
