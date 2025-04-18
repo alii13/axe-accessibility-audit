@@ -11,6 +11,9 @@ importers:
       '@axe-core/playwright':
         specifier: ^4.7.3
         version: 4.10.1(playwright-core@1.52.0)
+      playwright:
+        specifier: ^1.52.0
+        version: 1.52.0
     devDependencies:
       '@types/node':
         specifier: ^20.11.24
@@ -21,9 +24,6 @@ importers:
       install:
         specifier: ^0.13.0
         version: 0.13.0
-      playwright:
-        specifier: ^1.51.1
-        version: 1.52.0
       prettier:
         specifier: ^3.2.5
         version: 3.5.3
