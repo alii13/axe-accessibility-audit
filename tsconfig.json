@@ -10,11 +10,7 @@
         "outDir": "./dist",
         "rootDir": ".",
         "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "baseUrl": ".",
-        "paths": {
-            "*": ["node_modules/*"]
-        }
+        "resolveJsonModule": true
     },
     "include": ["./**/*.ts"],
     "exclude": ["node_modules", "dist"]

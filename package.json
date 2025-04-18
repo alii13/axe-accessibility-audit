@@ -18,5 +18,9 @@
         "prettier": "^3.2.5",
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3"
-    }
+    },
+    "engines": {
+        "node": ">=22.0.0"
+    },
+    "packageManager": "pnpm@9.0.0"
 }
