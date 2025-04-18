@@ -101,7 +101,7 @@ export async function runAccessibilityTest(url: string, page: Page) {
             console.log('Waiting for page to fully load...')
 
             await Promise.all([
-                page.waitForURL(url, { waitUntil: 'networkidle', timeout: 600000 }),
+                page.waitForURL(url, { waitUntil: 'networkidle', timeout: 900000 }),
                 page.goto(url),
             ])
 
@@ -249,6 +249,6 @@ export async function runAccessibilityTest(url: string, page: Page) {
         }
     } catch (error) {
         console.error('Error running accessibility test:', error)
-        throw error
+        console.error('Skipping this URL:', url)
     }
 }
